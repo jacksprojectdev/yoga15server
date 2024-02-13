@@ -1,0 +1,1 @@
+[10-Feb-2024 10:48:59 UTC] PHP Fatal error:  require(): Failed opening required './wp-load.php' (include_path='.:/usr/local/php74/pear') in /home/customer/www/yoga15.com/public_html/app-assist/subscriber.php on line 4
