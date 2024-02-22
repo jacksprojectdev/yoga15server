@@ -32,10 +32,10 @@ function checkSubscriber($user_id) {
   $is_subscriber = false;
 
   foreach($plans as $plan) {
-    if($mepr_user->is_active_on_membership( $plan )) {
-      $is_subscriber = true;
-      break;
-    }
+	if($mepr_user->is_active_on_membership( $plan )) {
+	  $is_subscriber = true;
+	  break;
+	}
   }
 
   return $is_subscriber;
@@ -43,50 +43,68 @@ function checkSubscriber($user_id) {
 
 switch($action) {
   case "check":
-    $is_subscriber = checkSubscriber($user_id);
+	$is_subscriber = checkSubscriber($user_id);
 
-    die(json_encode(array("success" => true, "subscriber" => $is_subscriber)));
+	die(json_encode(array("success" => true, "subscriber" => $is_subscriber)));
   break;
   case "create":
-    $productId = intval($_GET["productId"]);
-    $price = $_GET["price"];
-    $periodType = $_GET["period"];
+	$productId = intval($_GET["productId"]);
+	$price = $_GET["price"];
+	$periodType = $_GET["period"];
 
-    if($periodType != "months" && $periodType != "years") {
-      die(json_encode(array("error" => "Invalid period ID")));
-    }
+	if($periodType != "months" && $periodType != "years") {
+	  die(json_encode(array("error" => "Invalid period ID")));
+	}
 
-    if(!in_array($productId, $plans)) {
-      die(json_encode(array("error" => "Invalid plan ID")));
-    }
+	if(!in_array($productId, $plans)) {
+	  die(json_encode(array("error" => "Invalid plan ID")));
+	}
 
-    if(checkSubscriber($user_id)) {
-      die(json_encode(array("error" => "Already subscriber")));
-    }
+	if(checkSubscriber($user_id)) {
+	  die(json_encode(array("error" => "Already subscriber")));
+	}
 
-    $sub = new MeprSubscription();
-    $sub->user_id = $user_id;
-    $sub->product_id = $productId;
-    $sub->price = $price;
-    $sub->total = $price;
-    $sub->period = 1;
-    $sub->period_type = $periodType;
-    $sub->status = MeprSubscription::$active_str;
-    $sub_id = $sub->store();
+	$sub = new MeprSubscription();
+	$sub->user_id = $user_id;
+	$sub->product_id = $productId;
+	$sub->price = $price;
+	$sub->total = $price;
+	$sub->period = 1;
+	$sub->period_type = $periodType;
+	$sub->status = MeprSubscription::$active_str;
+	$sub_id = $sub->store();
 
-    $txn = new MeprTransaction();
-    $txn->amount = $price;
-    $txn->total = $price;
-    $txn->user_id = $user_id;
-    $txn->product_id = $productId;
-    $txn->status = MeprTransaction::$complete_str;
-    $txn->txn_type = MeprTransaction::$payment_str;
-    $txn->gateway = 'manual';
-    $txn->expires_at = gmdate('Y-m-d 23:59:59', (time() + ($periodType == 'years' ? MeprUtils::years(1) : MeprUtils::months(1)) ));
-    $txn->subscription_id = $sub_id;
-    $txn->store();
+	$txn = new MeprTransaction();
+	$txn->amount = $price;
+	$txn->total = $price;
+	$txn->user_id = $user_id;
+	$txn->product_id = $productId;
+	$txn->status = MeprTransaction::$complete_str;
+	$txn->txn_type = MeprTransaction::$payment_str;
+	$txn->gateway = 'manual';
+	$txn->expires_at = gmdate('Y-m-d 23:59:59', (time() + ($periodType == 'years' ? MeprUtils::years(1) : MeprUtils::months(1)) ));
+	$txn->subscription_id = $sub_id;
+	$txn->store();
 
-    die(json_encode(array("success" => checkSubscriber($user_id))));
+	die(json_encode(array("success" => checkSubscriber($user_id))));
+  break;
+  case "remove":
+	$productId = intval($_GET["productId"]);
+
+	// Get the user's active subscriptions
+	$user_subscriptions = MeprSubscription::get_all_active_by_user_id($user_id);
+
+	foreach($user_subscriptions as $subscription) {
+	  if($subscription->product_id != $productId)
+		continue;
+
+	  $sub = new MeprSubscription($subscription->id);
+	  
+	  $sub->destroy();
+	}
+
+	die(json_encode(array("success" => !checkSubscriber($user_id))));
+
   break;
 }
 
