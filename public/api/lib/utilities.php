@@ -335,4 +335,26 @@
 	function getShareInfo($videoPost) {
 		return html_entity_decode($videoPost["url"]) . " - " . html_entity_decode($videoPost["post_title"]) . " on Yoga 15 - Become a better athlete in 15 minutes a day!";
 	}
+	function send_post_request($url, $data) {
+		// Initialize cURL session
+		$ch = curl_init($url);
+	
+		// Set cURL options
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	
+		// Execute cURL session and get the response
+		$response = curl_exec($ch);
+	
+		// Check for cURL errors
+		if (curl_errno($ch)) {
+			echo 'Curl error: ' . curl_error($ch);
+		}
+	
+		// Close cURL session
+		curl_close($ch);
+	
+		return $response;
+	}
 ?>

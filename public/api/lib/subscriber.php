@@ -15,11 +15,23 @@
 		return true;
 	}
 	function get_user_subscriber($userId) {
-		global $MYSQL;
-		global $WPDB;
-		global $ACCOUNT;
+		$userId = urlencode($userId);
 		
-		$res = json_decode(file_get_contents("https://yoga15.com/app-assist/subscriber.php?id=$userId&action=check&auth=iloveyogalol"));
+		$url = "https://yoga15.com/app-assist/subscriber.php?id=$userId&action=check&auth=iloveyogalol";
+		
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.9999.999 Safari/537.36');
+		
+		$response = curl_exec($ch);
+		
+		if(curl_errno($ch)) {
+			echo 'Curl error: ' . curl_error($ch);
+		}
+		
+		curl_close($ch);
+		
+		$res = json_decode($response);
 		
 		return $res->subscriber == true;
 	}
@@ -97,7 +109,50 @@
 			exit;
 		}
 		
-		$res = json_decode(file_get_contents("https://yoga15.com/app-assist/subscriber.php?id=$userId&action=create&auth=iloveyogalol&productId=$productId&price=$amount&period=$period"));
+	//	$res = json_decode(file_get_contents("https://yoga15.com/app-assist/subscriber.php?id=$userId&action=create&auth=iloveyogalol&productId=$productId&price=$amount&period=$period"));
+		
+		$userId = urlencode($userId);
+		$productId = urlencode($productId);
+		$amount = urlencode($amount);
+		$period = urlencode($period);
+		
+		$url = "https://yoga15.com/app-assist/subscriber.php?id=$userId&action=create&auth=iloveyogalol&productId=$productId&price=$amount&period=$period";
+		
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.9999.999 Safari/537.36');
+		
+		$response = curl_exec($ch);
+		
+		if(curl_errno($ch)) {
+			echo 'Curl error: ' . curl_error($ch);
+		}
+		
+		curl_close($ch);
+		
+		$res = json_decode($response);
+		
+		return $res->success;
+	}
+	function unmake_user_subscriber($userId, $productId) {
+		$userId = urlencode($userId);
+		$productId = urlencode($productId);
+		
+		$url = "https://yoga15.com/app-assist/subscriber.php?id=$userId&action=remove&auth=iloveyogalol&productId=$productId";
+		
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.9999.999 Safari/537.36');
+		
+		$response = curl_exec($ch);
+		
+		if(curl_errno($ch)) {
+			echo 'Curl error: ' . curl_error($ch);
+		}
+		
+		curl_close($ch);
+		
+		$res = json_decode($response);
 		
 		return $res->success;
 	}

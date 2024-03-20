@@ -45,7 +45,7 @@
 	
 	// Get category ids from associative array
 	$categoryIdsStr = "56,85,89,78,86,2848,242,241,243"; //$searchFilterSettings["taxonomies_settings"]["category"]["ids"];
-	$tagIdsStr = "4336,58,4302,4303,60,68,65,81,83,70,12,64,19,4327,74,66,20,42,76,4280,75,41,4,4272,4326,4325,4324"; //$searchFilterSettings["taxonomies_settings"]["post_tag"]["ids"];
+	$tagIdsStr = "4351,4350,4336,58,4302,4303,60,68,65,81,83,70,12,64,19,4327,74,66,20,42,76,4280,75,41,4,4272,4326,4325,4324"; //$searchFilterSettings["taxonomies_settings"]["post_tag"]["ids"];
 	
 	$categoryIds = explode(",", $categoryIdsStr);
 	$tagIds = explode(",", $tagIdsStr);

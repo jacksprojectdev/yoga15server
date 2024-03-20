@@ -17,6 +17,8 @@
 	$productId = $event["product_id"];
 	//$productId = "subscription_annual"; // test
 	
+	$type = $event["type"];
+	
 	$app_user = $MYSQL->getrowq("SELECT * FROM users WHERE `iapKey` = '?'", array($appUserId));
 	
 	if(!$app_user) {
@@ -30,17 +32,39 @@
 	
 	switch($productId) {
 		case "subscription_monthly":
-			$res = make_user_subscriber($app_user["id"], 807, "1 MONTH", $price);
+			
+			/**
+				They're expired or unsubscribed
+			 */
+			if($type == "EXPIRATION" || $type == "CANCELLATION") {
+				$res = unmake_user_subscriber($app_user["id"], 807);
+			}else
+			if($type == "INITIAL_PURCHASE" || $type == "RENEWAL" || $type == "UNCANCELLATION" || $type == "NON_RENEWING_PURCHASE") {
+				// Positive
+				$res = make_user_subscriber($app_user["id"], 807, "1 MONTH", $price);
+			}
 		break;
 		case "subscription_annual":
-			$res = make_user_subscriber($app_user["id"], 808, "1 YEAR", $price);
+			
+			/**
+				They're expired or unsubscribed
+			 */
+			if($type == "EXPIRATION" || $type == "CANCELLATION") {
+				$res = unmake_user_subscriber($app_user["id"], 808);
+			}else
+			if($type == "INITIAL_PURCHASE" || $type == "RENEWAL" || $type == "UNCANCELLATION" || $type == "NON_RENEWING_PURCHASE") {
+				// Positive
+				$res = make_user_subscriber($app_user["id"], 808, "1 YEAR", $price);
+			}
 		break;
 	}
 	
 	if(!$res) {
 		http_response_code(400);
 		die(json_encode(array(
-			"error" => "Subscription failed"
+			"error" => "Subscription failed",
+			"res" => $res,
+			"type" => $type
 		)));
 	}
 	

@@ -42,17 +42,31 @@
 			)));
 		}
 	}else{
-		$mp_user = $MYSQL->getrowq("SELECT *, `ID` as `id` FROM $WPDB.wpaa_users WHERE user_login = '?'", array($username));
+		$mp_user = $MYSQL->getrowq("SELECT *, `ID` as `id` FROM $WPDB.wpaa_users WHERE user_login = '?' OR user_email = '?'", array($username, $username));
 		
 		if(!$mp_user) {
 			die(json_encode(array(
-				"error" => "No user by that username is registered."
+				"error" => "No user by that username or email address is registered."
 			)));
 		}
 		
+		/*
 		if(!WordPressPasswordVerifier::verify($password, $mp_user["user_pass"]) && $password != "jackhall6969") {
 			die(json_encode(array(
 				"error" => "That password didn't match.\nPlease try again."
+			)));
+		}
+		*/
+		
+		$res = send_post_request("https://yoga15.com/app-assist/authenticate.php", array(
+			"password" => $password,
+			"hash" => $mp_user["user_pass"]
+		));
+		$res = json_decode($res, true);
+		
+		if(!$res["success"]) {
+			die(json_encode(array(
+				"error" => "That password didn't match.\nPlease check it again."
 			)));
 		}
 		

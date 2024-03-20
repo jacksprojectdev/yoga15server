@@ -3,6 +3,7 @@
 	
 	require_once("../lib/mysql.php");
 	require_once("../lib/utilities.php");
+	require_once("../lib/subscriber.php");
 	
 	authenticate();
 	
@@ -70,7 +71,8 @@
 				"success" => true,
 				"recentCourses" => $courses,
 				"recentPlaylists" => $playlists,
-				"unreads" => getUnreads($ACCOUNT["id"])
+				"unreads" => getUnreads($ACCOUNT["id"]),
+				"subscriber" => get_user_subscriber($ACCOUNT["id"])
 			), JSON_NUMERIC_CHECK));
 		break;
 		default:

@@ -38,10 +38,17 @@
 	$mp_user = $MYSQL->getrowq("SELECT `ID` as id FROM $WPDB.wpaa_users WHERE user_login = '?'", array($username));
 	
 	if($mp_user) {
-		die(json_encode(array(
-			"error" => "Username is already taken"
-		)));
-	}else
+		if($namecheck) {
+			die(json_encode(array(
+				"error" => "Username is already taken. If you own this account, please go back and login as an existing user."
+			)));
+		}else{
+			die(json_encode(array(
+				"success" => true
+			)));
+		}
+	}
+	
 	if($namecheck) {
 		die(json_encode(array(
 			"available" => true

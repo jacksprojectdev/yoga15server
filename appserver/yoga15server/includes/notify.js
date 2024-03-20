@@ -23,7 +23,7 @@ async function sendExpoNotification(deviceToken, title, body, data) {
 	headers,
   });
   
-  console.log(response.data);
+  console.log(response.data, deviceToken);
 }
 
 module.exports = sendExpoNotification;

@@ -776,12 +776,12 @@ function getMonday(d) {
 
 
 function notifyAll(title, body, data, field = 'allowNotifyBot') {
-	mysql.query('SELECT DISTINCT `token` FROM pushtokens WHERE (SELECT `' + field + '` FROM `users` WHERE users.id = pushtokens.mpid) = 1', (error, rows) => {
+	mysql.query('SELECT DISTINCT `token` FROM `pushtokens` WHERE (SELECT `' + field + '` FROM `users` WHERE users.id = pushtokens.mpid) = 1', (error, rows) => {
 		rows.forEach(row => sendExpoNotification(row.token, title, body, data));
 	})
 }
 function notify(id, title, body, data) {
-	mysql.query('SELECT DISTINCT `token` FROM pushtokens WHERE `mpid` = ?', [id], (error, rows) => {
+	mysql.query('SELECT DISTINCT `token` FROM `pushtokens` WHERE `mpid` = ?', [id], (error, rows) => {
 		if(!rows)
 			return;
 		
